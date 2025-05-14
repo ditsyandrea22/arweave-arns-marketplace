@@ -1,15 +1,156 @@
-.wallet-connected {
-    background-color: #e5e7eb !important;
-    color: #1f2937 !important;
-    cursor: default !important;
+/* styles/main.css */
+:root {
+  /* Color variables */
+  --color-primary: #6366f1;
+  --color-primary-hover: #4f46e5;
+  --color-text: #1f2937;
+  --color-text-light: #6b7280;
+  --color-bg: #ffffff;
+  --color-bg-secondary: #f9fafb;
+  --color-success: #10b981;
+  --color-error: #ef4444;
+  --color-warning: #f59e0b;
+  --color-info: #3b82f6;
+  --color-gray-light: #e5e7eb;
+  --color-gray-dark: #374151;
+}
+
+/* Base styles */
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem;
+  box-sizing: border-box;
+}
+
+/* Wallet state styles */
+.wallet-state {
+  transition: all 0.3s ease;
+  border-radius: 0.375rem;
+  padding: 0.5rem 1rem;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  
+  /* Default state (when connecting) */
+  &--default {
+    background-color: var(--color-primary);
+    color: white;
+    
+    &:hover {
+      background-color: var(--color-primary-hover);
+    }
   }
   
-  .wallet-error {
-    background-color: #fee2e2 !important;
-    color: #b91c1c !important;
+  /* Connected state */
+  &--connected {
+    background-color: var(--color-gray-light);
+    color: var(--color-text);
+    cursor: default;
+    
+    &:hover {
+      background-color: var(--color-gray-light);
+    }
   }
   
-  .wallet-processing {
-    background-color: #bfdbfe !important;
-    color: #1e40af !important;
+  /* Error state */
+  &--error {
+    background-color: color-mix(in srgb, var(--color-error) 10%, white);
+    color: var(--color-error);
+    
+    &:hover {
+      background-color: color-mix(in srgb, var(--color-error) 15%, white);
+    }
   }
+  
+  /* Processing state */
+  &--processing {
+    background-color: color-mix(in srgb, var(--color-info) 10%, white);
+    color: var(--color-info);
+    cursor: progress;
+    
+    &:hover {
+      background-color: color-mix(in srgb, var(--color-info) 15%, white);
+    }
+  }
+}
+
+/* ARNS Card Grid */
+.arn-grid {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: repeat(1, 1fr);
+  
+  @media (min-width: 640px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  @media (min-width: 1024px) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* ARNS Card Component */
+.arn-card {
+  background: var(--color-bg);
+  border-radius: 0.5rem;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  &__header {
+    padding: 1rem;
+    border-bottom: 1px solid var(--color-gray-light);
+  }
+  
+  &__title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--color-text);
+    margin: 0;
+  }
+  
+  &__body {
+    padding: 1rem;
+  }
+  
+  &__price {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--color-primary);
+  }
+  
+  &__footer {
+    padding: 1rem;
+    border-top: 1px solid var(--color-gray-light);
+    display: flex;
+    justify-content: flex-end;
+  }
+}
+
+/* Utility classes */
+.text-truncate {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Animation for processing state */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.processing-spinner {
+  animation: spin 1s linear infinite;
+}

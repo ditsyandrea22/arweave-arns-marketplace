@@ -10,28 +10,127 @@
     <script src="https://unpkg.com/arweave-account@1.0.2/dist/umd/index.js"></script>
     <style>
         :root {
-            --primary: #4f46e5;
-            --primary-hover: #4338ca;
-            --secondary: #7c3aed;
+            --color-primary: #4f46e5;
+            --color-primary-hover: #4338ca;
+            --color-secondary: #7c3aed;
+            --color-success: #10b981;
+            --color-error: #ef4444;
+            --color-warning: #f59e0b;
+            --color-info: #3b82f6;
+            --color-gray-100: #f3f4f6;
+            --color-gray-200: #e5e7eb;
+            --color-gray-300: #d1d5db;
+            --color-gray-700: #374151;
+            --color-gray-900: #111827;
         }
         
         .gradient-text {
-            background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+            background: linear-gradient(90deg, var(--color-primary) 0%, var(--color-secondary) 100%);
             -webkit-background-clip: text;
             background-clip: text;
             -webkit-text-fill-color: transparent;
         }
         
+        /* Wallet State Classes */
+        .wallet-state {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 0.375rem;
+            padding: 0.5rem 1rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .wallet-state--default {
+            background-color: var(--color-primary);
+            color: white;
+        }
+        
+        .wallet-state--default:hover {
+            background-color: var(--color-primary-hover);
+        }
+        
+        .wallet-state--connected {
+            background-color: var(--color-gray-200);
+            color: var(--color-gray-900);
+            cursor: default;
+        }
+        
+        .wallet-state--error {
+            background-color: color-mix(in srgb, var(--color-error) 10%, white);
+            color: var(--color-error);
+        }
+        
+        .wallet-state--processing {
+            background-color: color-mix(in srgb, var(--color-info) 10%, white);
+            color: var(--color-info);
+            cursor: progress;
+        }
+        
+        /* Domain Card Styles */
         .domain-card {
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            border: 1px solid #e5e7eb;
+            border: 1px solid var(--color-gray-200);
             cursor: pointer;
+            background-color: white;
+            border-radius: 0.75rem;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
         
         .domain-card:hover {
-            transform: translateY(-5px);
+            transform: translateY(-0.5rem);
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-            border-color: var(--primary);
+            border-color: var(--color-primary);
+        }
+        
+        .domain-card__header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--color-gray-200);
+        }
+        
+        .domain-card__title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--color-primary);
+            margin: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .domain-card__badge {
+            font-size: 0.75rem;
+            font-weight: 500;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+        }
+        
+        .domain-card__body {
+            padding: 1.5rem;
+        }
+        
+        .domain-card__price-label {
+            color: var(--color-gray-700);
+            font-size: 0.875rem;
+        }
+        
+        .domain-card__price-value {
+            font-size: 1.125rem;
+            font-weight: 600;
+        }
+        
+        .domain-card__footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--color-gray-200);
+            display: flex;
+            justify-content: flex-end;
+        }
+        
+        /* Search Input */
+        .search-input {
+            transition: all 0.3s ease;
         }
         
         .search-input:focus {
@@ -39,51 +138,57 @@
             box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.3);
         }
         
-        .btn-primary {
-            background-color: var(--primary);
-            transition: all 0.3s ease;
-        }
-        
-        .btn-primary:hover {
-            background-color: var(--primary-hover);
-        }
-        
-        .wallet-connected {
-            background-color: #e5e7eb !important;
-            color: #1f2937 !important;
-            cursor: default !important;
-        }
-        
-        .wallet-error {
-            background-color: #fee2e2 !important;
-            color: #b91c1c !important;
-        }
-        
-        .wallet-processing {
-            background-color: #bfdbfe !important;
-            color: #1e40af !important;
-        }
-
+        /* Notification System */
         .notification {
             position: fixed;
             bottom: 1rem;
             right: 1rem;
-            background-color: #1f2937;
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 0.375rem;
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
             transform: translateY(2rem);
             opacity: 0;
             transition: all 0.3s ease;
             z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
         }
-
+        
         .notification.show {
             transform: translateY(0);
             opacity: 1;
         }
-
+        
+        .notification--success {
+            background-color: var(--color-success);
+            color: white;
+        }
+        
+        .notification--error {
+            background-color: var(--color-error);
+            color: white;
+        }
+        
+        .notification--info {
+            background-color: var(--color-gray-900);
+            color: white;
+        }
+        
+        /* Spinner Animation */
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .spinner {
+            animation: spin 1s linear infinite;
+        }
+        
+        /* Mobile Menu */
+        #mobile-menu {
+            transition: all 0.3s ease;
+        }
+        
         @media (max-width: 768px) {
             .hero-title {
                 font-size: 2.25rem;
@@ -115,8 +220,8 @@
                 <button class="hidden md:block px-4 py-2 text-gray-600 hover:text-indigo-600 transition-colors">
                     <i class="fas fa-search"></i>
                 </button>
-                <button id="connect-wallet" class="btn-primary text-white px-4 py-2 rounded-md text-sm font-medium">
-                    Connect Wallet
+                <button id="connect-wallet" class="wallet-state wallet-state--default">
+                    <span>Connect Wallet</span>
                 </button>
                 <button id="mobile-menu-button" class="md:hidden text-gray-600 hover:text-indigo-600">
                     <i class="fas fa-bars text-xl"></i>
@@ -137,8 +242,9 @@
                     placeholder="Search for domains..." 
                     class="search-input flex-grow px-6 py-3 rounded-full focus:outline-none"
                 >
-                <button class="btn-primary text-white px-6 py-3 rounded-full hover:bg-indigo-700 transition-colors">
-                    Search
+                <button class="wallet-state wallet-state--default px-6 py-3 rounded-full">
+                    <i class="fas fa-search mr-2"></i>
+                    <span>Search</span>
                 </button>
             </div>
             
@@ -171,19 +277,21 @@
         
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             <!-- Domain Card 1 -->
-            <div class="domain-card bg-white rounded-xl shadow-sm overflow-hidden">
-                <div class="p-6">
-                    <div class="flex justify-between items-start mb-2">
-                        <h3 class="text-xl font-bold text-indigo-600 truncate">example.arns</h3>
-                        <span class="bg-indigo-100 text-indigo-800 text-xs px-2 py-1 rounded">Premium</span>
+            <div class="domain-card">
+                <div class="domain-card__header">
+                    <div class="flex justify-between items-start">
+                        <h3 class="domain-card__title">example.arns</h3>
+                        <span class="domain-card__badge bg-indigo-100 text-indigo-800">Premium</span>
                     </div>
-                    <p class="text-gray-500 text-sm mb-4">Registered: 2025-10-15</p>
+                    <p class="text-gray-500 text-sm mt-2">Registered: 2025-10-15</p>
+                </div>
+                <div class="domain-card__body">
                     <div class="flex justify-between items-center">
                         <div>
-                            <p class="text-gray-500 text-sm">Price</p>
-                            <p class="text-lg font-semibold">0.5 AR</p>
+                            <p class="domain-card__price-label">Price</p>
+                            <p class="domain-card__price-value">0.5 AR</p>
                         </div>
-                        <button class="buy-now btn-primary text-white px-4 py-2 rounded-md text-sm" data-domain="example.arns" data-price="0.5">
+                        <button class="buy-now wallet-state wallet-state--default" data-domain="example.arns" data-price="0.5">
                             Buy Now
                         </button>
                     </div>
@@ -191,19 +299,21 @@
             </div>
             
             <!-- Domain Card 2 -->
-            <div class="domain-card bg-white rounded-xl shadow-sm overflow-hidden">
-                <div class="p-6">
-                    <div class="flex justify-between items-start mb-2">
-                        <h3 class="text-xl font-bold text-indigo-600 truncate">crypto.arns</h3>
-                        <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">New</span>
+            <div class="domain-card">
+                <div class="domain-card__header">
+                    <div class="flex justify-between items-start">
+                        <h3 class="domain-card__title">crypto.arns</h3>
+                        <span class="domain-card__badge bg-green-100 text-green-800">New</span>
                     </div>
-                    <p class="text-gray-500 text-sm mb-4">Registered: 2025-11-02</p>
+                    <p class="text-gray-500 text-sm mt-2">Registered: 2025-11-02</p>
+                </div>
+                <div class="domain-card__body">
                     <div class="flex justify-between items-center">
                         <div>
-                            <p class="text-gray-500 text-sm">Price</p>
-                            <p class="text-lg font-semibold">1.2 AR</p>
+                            <p class="domain-card__price-label">Price</p>
+                            <p class="domain-card__price-value">1.2 AR</p>
                         </div>
-                        <button class="buy-now btn-primary text-white px-4 py-2 rounded-md text-sm" data-domain="crypto.arns" data-price="1.2">
+                        <button class="buy-now wallet-state wallet-state--default" data-domain="crypto.arns" data-price="1.2">
                             Buy Now
                         </button>
                     </div>
@@ -211,19 +321,21 @@
             </div>
             
             <!-- Domain Card 3 -->
-            <div class="domain-card bg-white rounded-xl shadow-sm overflow-hidden">
-                <div class="p-6">
-                    <div class="flex justify-between items-start mb-2">
-                        <h3 class="text-xl font-bold text-indigo-600 truncate">wallet.arns</h3>
-                        <span class="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded">Deal</span>
+            <div class="domain-card">
+                <div class="domain-card__header">
+                    <div class="flex justify-between items-start">
+                        <h3 class="domain-card__title">wallet.arns</h3>
+                        <span class="domain-card__badge bg-yellow-100 text-yellow-800">Deal</span>
                     </div>
-                    <p class="text-gray-500 text-sm mb-4">Registered: 2025-09-28</p>
+                    <p class="text-gray-500 text-sm mt-2">Registered: 2025-09-28</p>
+                </div>
+                <div class="domain-card__body">
                     <div class="flex justify-between items-center">
                         <div>
-                            <p class="text-gray-500 text-sm">Price</p>
-                            <p class="text-lg font-semibold">0.8 AR</p>
+                            <p class="domain-card__price-label">Price</p>
+                            <p class="domain-card__price-value">0.8 AR</p>
                         </div>
-                        <button class="buy-now btn-primary text-white px-4 py-2 rounded-md text-sm" data-domain="wallet.arns" data-price="0.8">
+                        <button class="buy-now wallet-state wallet-state--default" data-domain="wallet.arns" data-price="0.8">
                             Buy Now
                         </button>
                     </div>
@@ -231,19 +343,21 @@
             </div>
             
             <!-- Domain Card 4 -->
-            <div class="domain-card bg-white rounded-xl shadow-sm overflow-hidden">
-                <div class="p-6">
-                    <div class="flex justify-between items-start mb-2">
-                        <h3 class="text-xl font-bold text-indigo-600 truncate">nft.arns</h3>
-                        <span class="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded">Hot</span>
+            <div class="domain-card">
+                <div class="domain-card__header">
+                    <div class="flex justify-between items-start">
+                        <h3 class="domain-card__title">nft.arns</h3>
+                        <span class="domain-card__badge bg-purple-100 text-purple-800">Hot</span>
                     </div>
-                    <p class="text-gray-500 text-sm mb-4">Registered: 2025-10-30</p>
+                    <p class="text-gray-500 text-sm mt-2">Registered: 2025-10-30</p>
+                </div>
+                <div class="domain-card__body">
                     <div class="flex justify-between items-center">
                         <div>
-                            <p class="text-gray-500 text-sm">Price</p>
-                            <p class="text-lg font-semibold">2.5 AR</p>
+                            <p class="domain-card__price-label">Price</p>
+                            <p class="domain-card__price-value">2.5 AR</p>
                         </div>
-                        <button class="buy-now btn-primary text-white px-4 py-2 rounded-md text-sm" data-domain="nft.arns" data-price="2.5">
+                        <button class="buy-now wallet-state wallet-state--default" data-domain="nft.arns" data-price="2.5">
                             Buy Now
                         </button>
                     </div>
@@ -361,8 +475,8 @@
             <a href="/domains" class="text-xl text-gray-700 hover:text-indigo-600 transition-colors">My Domains</a>
             <a href="/faq" class="text-xl text-gray-700 hover:text-indigo-600 transition-colors">FAQ</a>
         </nav>
-        <button id="mobile-connect-wallet" class="btn-primary text-white px-6 py-3 rounded-md text-lg mt-8">
-            Connect Wallet
+        <button id="mobile-connect-wallet" class="wallet-state wallet-state--default mt-8 py-3 text-lg">
+            <span>Connect Wallet</span>
         </button>
     </div>
 
@@ -372,140 +486,211 @@
         const arweave = Arweave.init({
             host: 'arweave.net',
             port: 443,
-            protocol: 'https'
+            protocol: 'https',
+            timeout: 20000
         });
 
-        // Check for Arweave wallet extension
-        function checkArweaveWallet() {
-            if (!window.arweaveWallet) {
-                showNotification('Arweave wallet extension not detected. Please install ArConnect.', true);
-                window.open('https://arconnect.io', '_blank');
-                return false;
+        // Wallet Manager
+        class WalletManager {
+            constructor() {
+                this.walletAddress = localStorage.getItem('arweaveAddress') || null;
+                this.isConnecting = false;
             }
-            return true;
-        }
 
-        // Show notification function
-        function showNotification(message, isError = false) {
-            const notification = document.createElement('div');
-            notification.className = `notification ${isError ? 'bg-red-500' : 'bg-gray-800'}`;
-            notification.textContent = message;
-            document.body.appendChild(notification);
-            
-            setTimeout(() => {
-                notification.classList.add('show');
-            }, 10);
-            
-            setTimeout(() => {
-                notification.classList.remove('show');
-                setTimeout(() => notification.remove(), 300);
-            }, 3000);
-        }
+            async connect() {
+                if (this.isConnecting) return null;
+                this.isConnecting = true;
 
-        // Connect wallet function
-        async function connectWallet() {
-            if (!checkArweaveWallet()) return;
-            
-            try {
+                try {
+                    if (!this.hasWalletExtension()) {
+                        this.showNotification('ArConnect extension not detected. Please install it.', 'error');
+                        window.open('https://arconnect.io', '_blank');
+                        return null;
+                    }
+
+                    await window.arweaveWallet.connect([
+                        'ACCESS_ADDRESS',
+                        'SIGN_TRANSACTION',
+                        'DISPATCH'
+                    ]);
+
+                    this.walletAddress = await window.arweaveWallet.getActiveAddress();
+                    localStorage.setItem('arweaveAddress', this.walletAddress);
+                    
+                    this.updateUI();
+                    this.showNotification('Wallet connected successfully!', 'success');
+                    
+                    return this.walletAddress;
+                } catch (error) {
+                    console.error('Wallet connection error:', error);
+                    this.walletAddress = null;
+                    localStorage.removeItem('arweaveAddress');
+                    this.showNotification(`Failed to connect wallet: ${error.message}`, 'error');
+                    throw error;
+                } finally {
+                    this.isConnecting = false;
+                }
+            }
+
+            async disconnect() {
+                try {
+                    if (window.arweaveWallet) {
+                        await window.arweaveWallet.disconnect();
+                    }
+                    this.walletAddress = null;
+                    localStorage.removeItem('arweaveAddress');
+                    this.updateUI();
+                } catch (error) {
+                    console.error('Wallet disconnection failed:', error);
+                    throw error;
+                }
+            }
+
+            hasWalletExtension() {
+                return !!window.arweaveWallet;
+            }
+
+            getShortAddress() {
+                if (!this.walletAddress) return null;
+                return `${this.walletAddress.substring(0, 6)}...${this.walletAddress.substring(this.walletAddress.length - 4)}`;
+            }
+
+            updateUI() {
                 const walletBtn = document.getElementById('connect-wallet');
                 const mobileWalletBtn = document.getElementById('mobile-connect-wallet');
                 
-                // Set processing state
-                walletBtn.classList.add('wallet-processing');
-                if (mobileWalletBtn) mobileWalletBtn.classList.add('wallet-processing');
-                
-                // Request permissions
-                await window.arweaveWallet.connect([
-                    'ACCESS_ADDRESS',
-                    'SIGN_TRANSACTION',
-                    'DISPATCH'
-                ]);
-                
-                // Get wallet address
-                const address = await window.arweaveWallet.getActiveAddress();
-                
-                // Update button states
-                const truncatedAddress = `${address.substring(0, 6)}...${address.substring(address.length - 4)}`;
-                walletBtn.textContent = truncatedAddress;
-                walletBtn.classList.remove('btn-primary', 'wallet-processing');
-                walletBtn.classList.add('wallet-connected');
-                
-                if (mobileWalletBtn) {
-                    mobileWalletBtn.textContent = truncatedAddress;
-                    mobileWalletBtn.classList.remove('btn-primary', 'wallet-processing');
-                    mobileWalletBtn.classList.add('wallet-connected');
-                }
-                
-                // Store address
-                localStorage.setItem('arweaveAddress', address);
-                
-                showNotification('Wallet connected successfully!');
-                return address;
-            } catch (error) {
-                console.error('Wallet connection error:', error);
-                
-                const walletBtn = document.getElementById('connect-wallet');
-                const mobileWalletBtn = document.getElementById('mobile-connect-wallet');
-                
-                walletBtn.classList.remove('wallet-processing');
-                walletBtn.classList.add('wallet-error');
-                walletBtn.textContent = 'Connection Failed';
-                
-                if (mobileWalletBtn) {
-                    mobileWalletBtn.classList.remove('wallet-processing');
-                    mobileWalletBtn.classList.add('wallet-error');
-                    mobileWalletBtn.textContent = 'Connection Failed';
-                }
-                
-                setTimeout(() => {
-                    walletBtn.classList.remove('wallet-error');
-                    walletBtn.classList.add('btn-primary');
-                    walletBtn.textContent = 'Connect Wallet';
+                if (this.walletAddress) {
+                    const shortAddress = this.getShortAddress();
+                    
+                    // Update main wallet button
+                    if (walletBtn) {
+                        walletBtn.innerHTML = `<span>${shortAddress}</span>`;
+                        walletBtn.className = 'wallet-state wallet-state--connected';
+                    }
+                    
+                    // Update mobile wallet button
+                    if (mobileWalletBtn) {
+                        mobileWalletBtn.innerHTML = `<span>${shortAddress}</span>`;
+                        mobileWalletBtn.className = 'wallet-state wallet-state--connected';
+                    }
+                } else {
+                    // Reset to default state
+                    if (walletBtn) {
+                        walletBtn.innerHTML = '<span>Connect Wallet</span>';
+                        walletBtn.className = 'wallet-state wallet-state--default';
+                    }
                     
                     if (mobileWalletBtn) {
-                        mobileWalletBtn.classList.remove('wallet-error');
-                        mobileWalletBtn.classList.add('btn-primary');
-                        mobileWalletBtn.textContent = 'Connect Wallet';
+                        mobileWalletBtn.innerHTML = '<span>Connect Wallet</span>';
+                        mobileWalletBtn.className = 'wallet-state wallet-state--default';
                     }
-                }, 3000);
-                
-                showNotification('Failed to connect wallet: ' + error.message, true);
-                throw error;
-            }
-        }
-
-        // Buy domain function
-        async function buyDomain(domainName, price) {
-            if (!checkArweaveWallet()) return;
-            
-            try {
-                // Check if wallet is connected
-                let address = localStorage.getItem('arweaveAddress');
-                if (!address) {
-                    address = await connectWallet();
                 }
+            }
+
+            showNotification(message, type = 'info') {
+                const notification = document.createElement('div');
+                notification.className = `notification notification--${type}`;
                 
-                showNotification(`Processing purchase of ${domainName} for ${price} AR...`);
+                // Add icon based on type
+                let iconClass = 'fa-info-circle';
+                if (type === 'success') iconClass = 'fa-check-circle';
+                if (type === 'error') iconClass = 'fa-exclamation-circle';
                 
-                // In a real implementation, you would:
-                // 1. Create a transaction to your smart contract
-                // 2. Include the domain name and payment
-                // 3. Dispatch the transaction
+                notification.innerHTML = `
+                    <i class="fas ${iconClass}"></i>
+                    <span>${message}</span>
+                `;
                 
-                // For demo purposes, we'll simulate a successful purchase
-                await new Promise(resolve => setTimeout(resolve, 2000));
+                document.body.appendChild(notification);
                 
-                showNotification(`Successfully purchased ${domainName}!`);
-                return true;
-            } catch (error) {
-                console.error('Purchase error:', error);
-                showNotification('Failed to complete purchase: ' + error.message, true);
-                throw error;
+                setTimeout(() => {
+                    notification.classList.add('show');
+                }, 10);
+                
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                    setTimeout(() => notification.remove(), 300);
+                }, 5000);
             }
         }
 
-        // DOM Content Loaded
-        document.addEventListener('DOMContentLoaded', function() {
+        // ARNS Marketplace
+        class ARNSMarketplace {
+            constructor(walletManager) {
+                this.walletManager = walletManager;
+            }
+
+            async buyDomain(domainName, price, recipientAddress = 'RECIPIENT_ADDRESS_HERE') {
+                try {
+                    // Validate inputs
+                    if (!domainName || !price) {
+                        throw new Error('Domain name and price are required');
+                    }
+
+                    // Ensure wallet is connected
+                    if (!this.walletManager.walletAddress) {
+                        await this.walletManager.connect();
+                        if (!this.walletManager.walletAddress) {
+                            throw new Error('Wallet connection required');
+                        }
+                    }
+
+                    this.walletManager.showNotification(`Processing purchase of ${domainName}...`, 'info');
+
+                    // Create transaction
+                    const transaction = await arweave.createTransaction({
+                        target: recipientAddress,
+                        quantity: arweave.ar.arToWinston(price.toString()),
+                    });
+
+                    // Add metadata as tags
+                    transaction.addTag('App-Name', 'ARNS-Marketplace');
+                    transaction.addTag('App-Version', '2.0.0');
+                    transaction.addTag('Type', 'domain-purchase');
+                    transaction.addTag('Domain', domainName);
+                    transaction.addTag('Buyer', this.walletManager.walletAddress);
+                    transaction.addTag('Timestamp', Date.now().toString());
+
+                    // Sign transaction
+                    await arweave.transactions.sign(transaction);
+                    
+                    // Submit transaction
+                    const response = await arweave.transactions.post(transaction);
+                    
+                    if (response.status !== 200) {
+                        throw new Error(`Transaction failed with status ${response.status}`);
+                    }
+
+                    this.walletManager.showNotification(
+                        `Success! Domain purchased. TX ID: ${transaction.id}`,
+                        'success'
+                    );
+
+                    return {
+                        transactionId: transaction.id,
+                        domainName,
+                        price,
+                        buyer: this.walletManager.walletAddress,
+                    };
+                } catch (error) {
+                    console.error('Domain purchase error:', error);
+                    this.walletManager.showNotification(
+                        `Purchase failed: ${error.message}`,
+                        'error'
+                    );
+                    throw error;
+                }
+            }
+        }
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', async function() {
+            const walletManager = new WalletManager();
+            const marketplace = new ARNSMarketplace(walletManager);
+
+            // Initialize UI with current wallet state
+            walletManager.updateUI();
+
             // Mobile menu toggle
             const mobileMenuButton = document.getElementById('mobile-menu-button');
             const closeMobileMenu = document.getElementById('close-mobile-menu');
@@ -523,44 +708,30 @@
                 });
             }
 
-            // Check for existing wallet connection
-            const savedAddress = localStorage.getItem('arweaveAddress');
-            const walletBtn = document.getElementById('connect-wallet');
-            const mobileWalletBtn = document.getElementById('mobile-connect-wallet');
-            
-            if (savedAddress && walletBtn) {
-                const truncatedAddress = `${savedAddress.substring(0, 6)}...${savedAddress.substring(savedAddress.length - 4)}`;
-                walletBtn.textContent = truncatedAddress;
-                walletBtn.classList.remove('btn-primary');
-                walletBtn.classList.add('wallet-connected');
-                
-                if (mobileWalletBtn) {
-                    mobileWalletBtn.textContent = truncatedAddress;
-                    mobileWalletBtn.classList.remove('btn-primary');
-                    mobileWalletBtn.classList.add('wallet-connected');
-                }
-            }
-            
-            // Wallet connection
-            if (walletBtn) {
-                walletBtn.addEventListener('click', connectWallet);
-            }
-            
-            if (mobileWalletBtn) {
-                mobileWalletBtn.addEventListener('click', connectWallet);
-            }
-            
+            // Wallet connection handlers
+            document.getElementById('connect-wallet')?.addEventListener('click', () => walletManager.connect());
+            document.getElementById('mobile-connect-wallet')?.addEventListener('click', () => walletManager.connect());
+
             // Buy Now buttons
             document.querySelectorAll('.buy-now').forEach(button => {
                 button.addEventListener('click', async function(e) {
-                    e.stopPropagation();
+                    e.preventDefault();
                     const domainName = this.getAttribute('data-domain');
                     const price = this.getAttribute('data-price');
                     
                     try {
-                        await buyDomain(domainName, price);
+                        // Set processing state
+                        this.innerHTML = '<i class="fas fa-spinner spinner mr-2"></i> Processing...';
+                        this.classList.add('wallet-state--processing');
+                        
+                        await marketplace.buyDomain(domainName, price);
                     } catch (error) {
                         console.error('Purchase failed:', error);
+                    } finally {
+                        // Reset button state
+                        this.innerHTML = 'Buy Now';
+                        this.classList.remove('wallet-state--processing');
+                        this.classList.add('wallet-state--default');
                     }
                 });
             });
@@ -568,9 +739,8 @@
             // Domain card clicks
             document.querySelectorAll('.domain-card').forEach(card => {
                 card.addEventListener('click', function() {
-                    const domainName = this.querySelector('h3').textContent;
-                    // In a real app, navigate to domain details
-                    showNotification(`Viewing details for ${domainName}`);
+                    const domainName = this.querySelector('.domain-card__title').textContent;
+                    walletManager.showNotification(`Viewing details for ${domainName}`, 'info');
                 });
             });
             
@@ -581,8 +751,7 @@
             if (searchInput && searchButton) {
                 const performSearch = (query) => {
                     if (query.trim()) {
-                        showNotification(`Searching for: ${query}`);
-                        // In a real implementation, filter results or navigate
+                        walletManager.showNotification(`Searching for: ${query}`, 'info');
                     }
                 };
                 
