@@ -6,6 +6,8 @@
     <title>ARNS Marketplace | Decentralized Naming Service</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://unpkg.com/arweave@1.10.0/bundles/web.bundle.min.js"></script>
+    <script src="https://unpkg.com/arweave-account@1.0.2/dist/umd/index.js"></script>
     <style>
         :root {
             --primary: #4f46e5;
@@ -23,6 +25,7 @@
         .domain-card {
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             border: 1px solid #e5e7eb;
+            cursor: pointer;
         }
         
         .domain-card:hover {
@@ -45,26 +48,42 @@
             background-color: var(--primary-hover);
         }
         
-        .tag-premium {
-            background-color: #e0e7ff;
-            color: #3730a3;
+        .wallet-connected {
+            background-color: #e5e7eb !important;
+            color: #1f2937 !important;
+            cursor: default !important;
         }
         
-        .tag-new {
-            background-color: #d1fae5;
-            color: #065f46;
+        .wallet-error {
+            background-color: #fee2e2 !important;
+            color: #b91c1c !important;
         }
         
-        .tag-deal {
-            background-color: #fef3c7;
-            color: #92400e;
+        .wallet-processing {
+            background-color: #bfdbfe !important;
+            color: #1e40af !important;
         }
-        
-        .tag-hot {
-            background-color: #ede9fe;
-            color: #5b21b6;
+
+        .notification {
+            position: fixed;
+            bottom: 1rem;
+            right: 1rem;
+            background-color: #1f2937;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            transform: translateY(2rem);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 100;
         }
-        
+
+        .notification.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
         @media (max-width: 768px) {
             .hero-title {
                 font-size: 2.25rem;
@@ -156,7 +175,7 @@
                 <div class="p-6">
                     <div class="flex justify-between items-start mb-2">
                         <h3 class="text-xl font-bold text-indigo-600 truncate">example.arns</h3>
-                        <span class="tag-premium text-xs px-2 py-1 rounded">Premium</span>
+                        <span class="bg-indigo-100 text-indigo-800 text-xs px-2 py-1 rounded">Premium</span>
                     </div>
                     <p class="text-gray-500 text-sm mb-4">Registered: 2025-10-15</p>
                     <div class="flex justify-between items-center">
@@ -164,7 +183,7 @@
                             <p class="text-gray-500 text-sm">Price</p>
                             <p class="text-lg font-semibold">0.5 AR</p>
                         </div>
-                        <button class="btn-primary text-white px-4 py-2 rounded-md text-sm">
+                        <button class="buy-now btn-primary text-white px-4 py-2 rounded-md text-sm" data-domain="example.arns" data-price="0.5">
                             Buy Now
                         </button>
                     </div>
@@ -176,7 +195,7 @@
                 <div class="p-6">
                     <div class="flex justify-between items-start mb-2">
                         <h3 class="text-xl font-bold text-indigo-600 truncate">crypto.arns</h3>
-                        <span class="tag-new text-xs px-2 py-1 rounded">New</span>
+                        <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">New</span>
                     </div>
                     <p class="text-gray-500 text-sm mb-4">Registered: 2025-11-02</p>
                     <div class="flex justify-between items-center">
@@ -184,7 +203,7 @@
                             <p class="text-gray-500 text-sm">Price</p>
                             <p class="text-lg font-semibold">1.2 AR</p>
                         </div>
-                        <button class="btn-primary text-white px-4 py-2 rounded-md text-sm">
+                        <button class="buy-now btn-primary text-white px-4 py-2 rounded-md text-sm" data-domain="crypto.arns" data-price="1.2">
                             Buy Now
                         </button>
                     </div>
@@ -196,7 +215,7 @@
                 <div class="p-6">
                     <div class="flex justify-between items-start mb-2">
                         <h3 class="text-xl font-bold text-indigo-600 truncate">wallet.arns</h3>
-                        <span class="tag-deal text-xs px-2 py-1 rounded">Deal</span>
+                        <span class="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded">Deal</span>
                     </div>
                     <p class="text-gray-500 text-sm mb-4">Registered: 2025-09-28</p>
                     <div class="flex justify-between items-center">
@@ -204,7 +223,7 @@
                             <p class="text-gray-500 text-sm">Price</p>
                             <p class="text-lg font-semibold">0.8 AR</p>
                         </div>
-                        <button class="btn-primary text-white px-4 py-2 rounded-md text-sm">
+                        <button class="buy-now btn-primary text-white px-4 py-2 rounded-md text-sm" data-domain="wallet.arns" data-price="0.8">
                             Buy Now
                         </button>
                     </div>
@@ -216,7 +235,7 @@
                 <div class="p-6">
                     <div class="flex justify-between items-start mb-2">
                         <h3 class="text-xl font-bold text-indigo-600 truncate">nft.arns</h3>
-                        <span class="tag-hot text-xs px-2 py-1 rounded">Hot</span>
+                        <span class="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded">Hot</span>
                     </div>
                     <p class="text-gray-500 text-sm mb-4">Registered: 2025-10-30</p>
                     <div class="flex justify-between items-center">
@@ -224,7 +243,7 @@
                             <p class="text-gray-500 text-sm">Price</p>
                             <p class="text-lg font-semibold">2.5 AR</p>
                         </div>
-                        <button class="btn-primary text-white px-4 py-2 rounded-md text-sm">
+                        <button class="buy-now btn-primary text-white px-4 py-2 rounded-md text-sm" data-domain="nft.arns" data-price="2.5">
                             Buy Now
                         </button>
                     </div>
@@ -342,13 +361,150 @@
             <a href="/domains" class="text-xl text-gray-700 hover:text-indigo-600 transition-colors">My Domains</a>
             <a href="/faq" class="text-xl text-gray-700 hover:text-indigo-600 transition-colors">FAQ</a>
         </nav>
-        <button class="btn-primary text-white px-6 py-3 rounded-md text-lg mt-8">
+        <button id="mobile-connect-wallet" class="btn-primary text-white px-6 py-3 rounded-md text-lg mt-8">
             Connect Wallet
         </button>
     </div>
 
     <!-- JavaScript -->
     <script>
+        // Initialize Arweave
+        const arweave = Arweave.init({
+            host: 'arweave.net',
+            port: 443,
+            protocol: 'https'
+        });
+
+        // Check for Arweave wallet extension
+        function checkArweaveWallet() {
+            if (!window.arweaveWallet) {
+                showNotification('Arweave wallet extension not detected. Please install ArConnect.', true);
+                window.open('https://arconnect.io', '_blank');
+                return false;
+            }
+            return true;
+        }
+
+        // Show notification function
+        function showNotification(message, isError = false) {
+            const notification = document.createElement('div');
+            notification.className = `notification ${isError ? 'bg-red-500' : 'bg-gray-800'}`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 10);
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // Connect wallet function
+        async function connectWallet() {
+            if (!checkArweaveWallet()) return;
+            
+            try {
+                const walletBtn = document.getElementById('connect-wallet');
+                const mobileWalletBtn = document.getElementById('mobile-connect-wallet');
+                
+                // Set processing state
+                walletBtn.classList.add('wallet-processing');
+                if (mobileWalletBtn) mobileWalletBtn.classList.add('wallet-processing');
+                
+                // Request permissions
+                await window.arweaveWallet.connect([
+                    'ACCESS_ADDRESS',
+                    'SIGN_TRANSACTION',
+                    'DISPATCH'
+                ]);
+                
+                // Get wallet address
+                const address = await window.arweaveWallet.getActiveAddress();
+                
+                // Update button states
+                const truncatedAddress = `${address.substring(0, 6)}...${address.substring(address.length - 4)}`;
+                walletBtn.textContent = truncatedAddress;
+                walletBtn.classList.remove('btn-primary', 'wallet-processing');
+                walletBtn.classList.add('wallet-connected');
+                
+                if (mobileWalletBtn) {
+                    mobileWalletBtn.textContent = truncatedAddress;
+                    mobileWalletBtn.classList.remove('btn-primary', 'wallet-processing');
+                    mobileWalletBtn.classList.add('wallet-connected');
+                }
+                
+                // Store address
+                localStorage.setItem('arweaveAddress', address);
+                
+                showNotification('Wallet connected successfully!');
+                return address;
+            } catch (error) {
+                console.error('Wallet connection error:', error);
+                
+                const walletBtn = document.getElementById('connect-wallet');
+                const mobileWalletBtn = document.getElementById('mobile-connect-wallet');
+                
+                walletBtn.classList.remove('wallet-processing');
+                walletBtn.classList.add('wallet-error');
+                walletBtn.textContent = 'Connection Failed';
+                
+                if (mobileWalletBtn) {
+                    mobileWalletBtn.classList.remove('wallet-processing');
+                    mobileWalletBtn.classList.add('wallet-error');
+                    mobileWalletBtn.textContent = 'Connection Failed';
+                }
+                
+                setTimeout(() => {
+                    walletBtn.classList.remove('wallet-error');
+                    walletBtn.classList.add('btn-primary');
+                    walletBtn.textContent = 'Connect Wallet';
+                    
+                    if (mobileWalletBtn) {
+                        mobileWalletBtn.classList.remove('wallet-error');
+                        mobileWalletBtn.classList.add('btn-primary');
+                        mobileWalletBtn.textContent = 'Connect Wallet';
+                    }
+                }, 3000);
+                
+                showNotification('Failed to connect wallet: ' + error.message, true);
+                throw error;
+            }
+        }
+
+        // Buy domain function
+        async function buyDomain(domainName, price) {
+            if (!checkArweaveWallet()) return;
+            
+            try {
+                // Check if wallet is connected
+                let address = localStorage.getItem('arweaveAddress');
+                if (!address) {
+                    address = await connectWallet();
+                }
+                
+                showNotification(`Processing purchase of ${domainName} for ${price} AR...`);
+                
+                // In a real implementation, you would:
+                // 1. Create a transaction to your smart contract
+                // 2. Include the domain name and payment
+                // 3. Dispatch the transaction
+                
+                // For demo purposes, we'll simulate a successful purchase
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+                showNotification(`Successfully purchased ${domainName}!`);
+                return true;
+            } catch (error) {
+                console.error('Purchase error:', error);
+                showNotification('Failed to complete purchase: ' + error.message, true);
+                throw error;
+            }
+        }
+
+        // DOM Content Loaded
         document.addEventListener('DOMContentLoaded', function() {
             // Mobile menu toggle
             const mobileMenuButton = document.getElementById('mobile-menu-button');
@@ -367,21 +523,57 @@
                 });
             }
 
-            // Wallet connection simulation
-            const connectWalletButton = document.getElementById('connect-wallet');
-            if (connectWalletButton) {
-                connectWalletButton.addEventListener('click', function() {
-                    // In a real app, you would connect to an actual wallet here
-                    this.textContent = '0x7f...3a4b';
-                    this.classList.remove('btn-primary', 'hover:bg-indigo-700');
-                    this.classList.add('bg-gray-200', 'text-gray-800', 'cursor-default');
-                    this.removeAttribute('id');
-                    
-                    // Show success notification
-                    showNotification('Wallet connected successfully!');
-                });
+            // Check for existing wallet connection
+            const savedAddress = localStorage.getItem('arweaveAddress');
+            const walletBtn = document.getElementById('connect-wallet');
+            const mobileWalletBtn = document.getElementById('mobile-connect-wallet');
+            
+            if (savedAddress && walletBtn) {
+                const truncatedAddress = `${savedAddress.substring(0, 6)}...${savedAddress.substring(savedAddress.length - 4)}`;
+                walletBtn.textContent = truncatedAddress;
+                walletBtn.classList.remove('btn-primary');
+                walletBtn.classList.add('wallet-connected');
+                
+                if (mobileWalletBtn) {
+                    mobileWalletBtn.textContent = truncatedAddress;
+                    mobileWalletBtn.classList.remove('btn-primary');
+                    mobileWalletBtn.classList.add('wallet-connected');
+                }
             }
-
+            
+            // Wallet connection
+            if (walletBtn) {
+                walletBtn.addEventListener('click', connectWallet);
+            }
+            
+            if (mobileWalletBtn) {
+                mobileWalletBtn.addEventListener('click', connectWallet);
+            }
+            
+            // Buy Now buttons
+            document.querySelectorAll('.buy-now').forEach(button => {
+                button.addEventListener('click', async function(e) {
+                    e.stopPropagation();
+                    const domainName = this.getAttribute('data-domain');
+                    const price = this.getAttribute('data-price');
+                    
+                    try {
+                        await buyDomain(domainName, price);
+                    } catch (error) {
+                        console.error('Purchase failed:', error);
+                    }
+                });
+            });
+            
+            // Domain card clicks
+            document.querySelectorAll('.domain-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    const domainName = this.querySelector('h3').textContent;
+                    // In a real app, navigate to domain details
+                    showNotification(`Viewing details for ${domainName}`);
+                });
+            });
+            
             // Search functionality
             const searchInput = document.querySelector('.search-input');
             const searchButton = document.querySelector('.search-input + button');
@@ -390,7 +582,7 @@
                 const performSearch = (query) => {
                     if (query.trim()) {
                         showNotification(`Searching for: ${query}`);
-                        // In a real implementation, this would redirect or filter results
+                        // In a real implementation, filter results or navigate
                     }
                 };
                 
@@ -399,43 +591,6 @@
                 searchInput.addEventListener('keypress', (e) => {
                     if (e.key === 'Enter') performSearch(searchInput.value);
                 });
-            }
-
-            // Buy Now buttons
-            document.querySelectorAll('.domain-card button').forEach(button => {
-                button.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    const domain = this.closest('.domain-card').querySelector('h3').textContent;
-                    showNotification(`Added ${domain} to cart`);
-                });
-            });
-
-            // Domain card click
-            document.querySelectorAll('.domain-card').forEach(card => {
-                card.addEventListener('click', function() {
-                    const domain = this.querySelector('h3').textContent;
-                    // In a real app, this would navigate to the domain details page
-                    showNotification(`Viewing details for ${domain}`);
-                });
-            });
-
-            // Notification function
-            function showNotification(message) {
-                const notification = document.createElement('div');
-                notification.className = 'fixed bottom-4 right-4 bg-gray-800 text-white px-4 py-2 rounded-md shadow-lg transform translate-y-10 opacity-0 transition-all duration-300';
-                notification.textContent = message;
-                document.body.appendChild(notification);
-                
-                setTimeout(() => {
-                    notification.classList.remove('translate-y-10', 'opacity-0');
-                    notification.classList.add('translate-y-0', 'opacity-100');
-                }, 10);
-                
-                setTimeout(() => {
-                    notification.classList.remove('translate-y-0', 'opacity-100');
-                    notification.classList.add('translate-y-10', 'opacity-0');
-                    setTimeout(() => notification.remove(), 300);
-                }, 3000);
             }
         });
     </script>
