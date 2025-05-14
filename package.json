@@ -1,6 +1,7 @@
 {
   "name": "arweave-arns-marketplace",
   "version": "1.0.0",
+  "private": true,
   "main": "index.js",
   "scripts": {
     "start": "react-scripts start",
@@ -26,19 +27,13 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-input-autosize": "3.0.0",
-    "react-scripts": "^5.0.1"
+    "react-scripts": "5.0.1",
+    "web-vitals": "^2.1.4"
   },
   "resolutions": {
     "core-js": "^3.35.0",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-qr-reader": "^3.0.0-beta.1"
-  },
-  "overrides": {
-    "react-qr-reader": {
-      "react": "^18.2.0",
-      "react-dom": "^18.2.0"
-    }
+    "react": "18.2.0",
+    "react-dom": "18.2.0"
   },
   "browserslist": {
     "production": [
@@ -51,5 +46,9 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=7.0.0"
   }
 }

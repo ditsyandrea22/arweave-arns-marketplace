@@ -1,0 +1,1 @@
+<Route path="/my-domains" element={<MyDomains />} />
