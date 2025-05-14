@@ -1,0 +1,54 @@
+{
+  "name": "arweave-arns-marketplace",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "react-scripts start",
+    "build": "react-scripts build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ditsyandrea22/arweave-arns-marketplace.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ditsyandrea22/arweave-arns-marketplace/issues"
+  },
+  "homepage": "https://github.com/ditsyandrea22/arweave-arns-marketplace#readme",
+  "description": "",
+  "dependencies": {
+    "arconnect": "git+https://github.com/arconnectio/arconnect.git#v1.27.0",
+    "core-js": "^3.35.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-input-autosize": "3.0.0",
+    "react-scripts": "^5.0.1"
+  },
+  "resolutions": {
+    "core-js": "^3.35.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-qr-reader": "^3.0.0-beta.1"
+  },
+  "overrides": {
+    "react-qr-reader": {
+      "react": "^18.2.0",
+      "react-dom": "^18.2.0"
+    }
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}

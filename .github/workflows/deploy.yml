@@ -1,0 +1,42 @@
+name: Deploy Contracts and Frontend
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'contracts/**'
+      - 'frontend/**'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+      
+      - name: Install dependencies
+        run: |
+          cd contracts && npm install
+          cd ../frontend && npm install
+      
+      - name: Deploy contracts
+        env:
+          ARWEAVE_WALLET: ${{ secrets.ARWEAVE_WALLET }}
+        run: |
+          cd contracts && node deploy.js
+      
+      - name: Build frontend
+        run: |
+          cd frontend && npm run build
+      
+      - name: Deploy frontend
+        env:
+          ARWEAVE_WALLET: ${{ secrets.ARWEAVE_WALLET }}
+        run: |
+          npm install -g arweave-deploy
+          arweave deploy-dir frontend/build --wallet-file wallet.json
