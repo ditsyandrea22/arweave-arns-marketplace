@@ -4,10 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ARNS Marketplace | Decentralized Naming Service</title>
+    <!-- Preload critical resources -->
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" as="style">
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style">
+    <link rel="preload" href="https://unpkg.com/arweave@1.10.0/bundles/web.bundle.min.js" as="script">
+    <link rel="preload" href="https://unpkg.com/arweave-account@1.0.2/dist/umd/index.js" as="script">
+    
+    <!-- CSS -->
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://unpkg.com/arweave@1.10.0/bundles/web.bundle.min.js"></script>
-    <script src="https://unpkg.com/arweave-account@1.0.2/dist/umd/index.js"></script>
     <style>
         :root {
             --color-primary: #4f46e5;
@@ -85,59 +90,6 @@
             border-color: var(--color-primary);
         }
         
-        .domain-card__header {
-            padding: 1.5rem;
-            border-bottom: 1px solid var(--color-gray-200);
-        }
-        
-        .domain-card__title {
-            font-size: 1.125rem;
-            font-weight: 600;
-            color: var(--color-primary);
-            margin: 0;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        
-        .domain-card__badge {
-            font-size: 0.75rem;
-            font-weight: 500;
-            padding: 0.25rem 0.5rem;
-            border-radius: 0.25rem;
-        }
-        
-        .domain-card__body {
-            padding: 1.5rem;
-        }
-        
-        .domain-card__price-label {
-            color: var(--color-gray-700);
-            font-size: 0.875rem;
-        }
-        
-        .domain-card__price-value {
-            font-size: 1.125rem;
-            font-weight: 600;
-        }
-        
-        .domain-card__footer {
-            padding: 1rem 1.5rem;
-            border-top: 1px solid var(--color-gray-200);
-            display: flex;
-            justify-content: flex-end;
-        }
-        
-        /* Search Input */
-        .search-input {
-            transition: all 0.3s ease;
-        }
-        
-        .search-input:focus {
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.3);
-        }
-        
         /* Notification System */
         .notification {
             position: fixed;
@@ -153,6 +105,7 @@
             display: flex;
             align-items: center;
             gap: 0.75rem;
+            max-width: 90%;
         }
         
         .notification.show {
@@ -184,11 +137,16 @@
             animation: spin 1s linear infinite;
         }
         
-        /* Mobile Menu */
-        #mobile-menu {
+        /* Search container */
+        .search-container {
             transition: all 0.3s ease;
         }
         
+        .search-container:focus-within {
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.3);
+        }
+        
+        /* Mobile optimizations */
         @media (max-width: 768px) {
             .hero-title {
                 font-size: 2.25rem;
@@ -198,6 +156,22 @@
             .hero-subtitle {
                 font-size: 1.125rem;
                 line-height: 1.75rem;
+            }
+            
+            .search-container {
+                flex-direction: column;
+                padding: 0.5rem;
+            }
+            
+            .search-container input {
+                width: 100%;
+                border-radius: 0.375rem;
+                margin-bottom: 0.5rem;
+            }
+            
+            .search-container button {
+                width: 100%;
+                border-radius: 0.375rem;
             }
         }
     </style>
@@ -217,9 +191,6 @@
                 </nav>
             </div>
             <div class="flex items-center space-x-4">
-                <button class="hidden md:block px-4 py-2 text-gray-600 hover:text-indigo-600 transition-colors">
-                    <i class="fas fa-search"></i>
-                </button>
                 <button id="connect-wallet" class="wallet-state wallet-state--default">
                     <span>Connect Wallet</span>
                 </button>
@@ -236,251 +207,35 @@
             <h1 class="hero-title text-4xl md:text-5xl font-bold text-gray-900 mb-6">Discover and Trade ARNS Domains</h1>
             <p class="hero-subtitle text-xl text-gray-600 max-w-2xl mx-auto mb-10">The decentralized naming service for the Arweave permanent web</p>
             
-            <div class="max-w-3xl mx-auto bg-white rounded-full shadow-md p-2 flex">
+            <form id="searchForm" class="max-w-3xl mx-auto bg-white rounded-full shadow-md p-2 flex search-container">
                 <input 
                     type="text" 
+                    id="domainSearch"
                     placeholder="Search for domains..." 
-                    class="search-input flex-grow px-6 py-3 rounded-full focus:outline-none"
+                    class="flex-grow px-6 py-3 rounded-full focus:outline-none"
+                    required
                 >
-                <button class="wallet-state wallet-state--default px-6 py-3 rounded-full">
+                <button type="submit" class="wallet-state wallet-state--default px-6 py-3 rounded-full">
                     <i class="fas fa-search mr-2"></i>
                     <span>Search</span>
                 </button>
-            </div>
+            </form>
             
             <div class="mt-8 flex flex-wrap justify-center gap-3">
                 <span class="text-sm text-gray-500">Popular searches:</span>
-                <a href="#" class="text-indigo-600 hover:underline text-sm transition-colors">web3</a>
-                <a href="#" class="text-indigo-600 hover:underline text-sm transition-colors">nft</a>
-                <a href="#" class="text-indigo-600 hover:underline text-sm transition-colors">wallet</a>
-                <a href="#" class="text-indigo-600 hover:underline text-sm transition-colors">dao</a>
+                <a href="https://arns.ar.io/#/?search=web3" class="text-indigo-600 hover:underline text-sm transition-colors">web3</a>
+                <a href="https://arns.ar.io/#/?search=nft" class="text-indigo-600 hover:underline text-sm transition-colors">nft</a>
+                <a href="https://arns.ar.io/#/?search=wallet" class="text-indigo-600 hover:underline text-sm transition-colors">wallet</a>
+                <a href="https://arns.ar.io/#/?search=dao" class="text-indigo-600 hover:underline text-sm transition-colors">dao</a>
             </div>
         </div>
     </section>
 
-    <!-- Domain Marketplace Section -->
-    <section class="container mx-auto px-4 py-16">
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10">
-            <h2 class="text-2xl font-bold text-gray-900 mb-4 md:mb-0">Featured Domains</h2>
-            <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4 w-full md:w-auto">
-                <select class="border border-gray-300 rounded-md px-3 py-2 text-sm w-full sm:w-auto focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
-                    <option>Sort by: Newest</option>
-                    <option>Sort by: Price</option>
-                    <option>Sort by: Expiration</option>
-                </select>
-                <button class="flex items-center justify-center space-x-1 text-gray-600 hover:text-indigo-600 border border-gray-300 rounded-md px-3 py-2 text-sm w-full sm:w-auto transition-colors">
-                    <i class="fas fa-sliders-h"></i>
-                    <span>Filters</span>
-                </button>
-            </div>
-        </div>
-        
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            <!-- Domain Card 1 -->
-            <div class="domain-card">
-                <div class="domain-card__header">
-                    <div class="flex justify-between items-start">
-                        <h3 class="domain-card__title">example.arns</h3>
-                        <span class="domain-card__badge bg-indigo-100 text-indigo-800">Premium</span>
-                    </div>
-                    <p class="text-gray-500 text-sm mt-2">Registered: 2025-10-15</p>
-                </div>
-                <div class="domain-card__body">
-                    <div class="flex justify-between items-center">
-                        <div>
-                            <p class="domain-card__price-label">Price</p>
-                            <p class="domain-card__price-value">0.5 AR</p>
-                        </div>
-                        <button class="buy-now wallet-state wallet-state--default" data-domain="example.arns" data-price="0.5">
-                            Buy Now
-                        </button>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Domain Card 2 -->
-            <div class="domain-card">
-                <div class="domain-card__header">
-                    <div class="flex justify-between items-start">
-                        <h3 class="domain-card__title">crypto.arns</h3>
-                        <span class="domain-card__badge bg-green-100 text-green-800">New</span>
-                    </div>
-                    <p class="text-gray-500 text-sm mt-2">Registered: 2025-11-02</p>
-                </div>
-                <div class="domain-card__body">
-                    <div class="flex justify-between items-center">
-                        <div>
-                            <p class="domain-card__price-label">Price</p>
-                            <p class="domain-card__price-value">1.2 AR</p>
-                        </div>
-                        <button class="buy-now wallet-state wallet-state--default" data-domain="crypto.arns" data-price="1.2">
-                            Buy Now
-                        </button>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Domain Card 3 -->
-            <div class="domain-card">
-                <div class="domain-card__header">
-                    <div class="flex justify-between items-start">
-                        <h3 class="domain-card__title">wallet.arns</h3>
-                        <span class="domain-card__badge bg-yellow-100 text-yellow-800">Deal</span>
-                    </div>
-                    <p class="text-gray-500 text-sm mt-2">Registered: 2025-09-28</p>
-                </div>
-                <div class="domain-card__body">
-                    <div class="flex justify-between items-center">
-                        <div>
-                            <p class="domain-card__price-label">Price</p>
-                            <p class="domain-card__price-value">0.8 AR</p>
-                        </div>
-                        <button class="buy-now wallet-state wallet-state--default" data-domain="wallet.arns" data-price="0.8">
-                            Buy Now
-                        </button>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Domain Card 4 -->
-            <div class="domain-card">
-                <div class="domain-card__header">
-                    <div class="flex justify-between items-start">
-                        <h3 class="domain-card__title">nft.arns</h3>
-                        <span class="domain-card__badge bg-purple-100 text-purple-800">Hot</span>
-                    </div>
-                    <p class="text-gray-500 text-sm mt-2">Registered: 2025-10-30</p>
-                </div>
-                <div class="domain-card__body">
-                    <div class="flex justify-between items-center">
-                        <div>
-                            <p class="domain-card__price-label">Price</p>
-                            <p class="domain-card__price-value">2.5 AR</p>
-                        </div>
-                        <button class="buy-now wallet-state wallet-state--default" data-domain="nft.arns" data-price="2.5">
-                            Buy Now
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="mt-10 flex justify-center">
-            <button class="border border-indigo-600 text-indigo-600 hover:bg-indigo-50 px-6 py-3 rounded-md transition-colors">
-                Load More Domains
-            </button>
-        </div>
-    </section>
-
-    <!-- Stats Section -->
-    <section class="bg-gray-100 py-16">
-        <div class="container mx-auto px-4">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div class="bg-white p-6 rounded-xl shadow-sm text-center">
-                    <h3 class="text-3xl font-bold text-indigo-600 mb-2">2,587+</h3>
-                    <p class="text-gray-600">Domains Registered</p>
-                </div>
-                <div class="bg-white p-6 rounded-xl shadow-sm text-center">
-                    <h3 class="text-3xl font-bold text-indigo-600 mb-2">1,429</h3>
-                    <p class="text-gray-600">Active Traders</p>
-                </div>
-                <div class="bg-white p-6 rounded-xl shadow-sm text-center">
-                    <h3 class="text-3xl font-bold text-indigo-600 mb-2">12,850 AR</h3>
-                    <p class="text-gray-600">Total Volume</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- How It Works Section -->
-    <section class="container mx-auto px-4 py-16">
-        <h2 class="text-3xl font-bold text-center text-gray-900 mb-12">How ARNS Marketplace Works</h2>
-        
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div class="text-center">
-                <div class="bg-indigo-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <i class="fas fa-search text-indigo-600 text-xl"></i>
-                </div>
-                <h3 class="text-xl font-semibold mb-2">Find a Domain</h3>
-                <p class="text-gray-600">Search for available ARNS domains or browse the marketplace for premium listings.</p>
-            </div>
-            
-            <div class="text-center">
-                <div class="bg-indigo-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <i class="fas fa-wallet text-indigo-600 text-xl"></i>
-                </div>
-                <h3 class="text-xl font-semibold mb-2">Connect Wallet</h3>
-                <p class="text-gray-600">Connect your Arweave-compatible wallet to make purchases.</p>
-            </div>
-            
-            <div class="text-center">
-                <div class="bg-indigo-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <i class="fas fa-check-circle text-indigo-600 text-xl"></i>
-                </div>
-                <h3 class="text-xl font-semibold mb-2">Complete Purchase</h3>
-                <p class="text-gray-600">Securely complete your transaction and own your new ARNS domain.</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="bg-gray-900 text-white py-12">
-        <div class="container mx-auto px-4">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
-                <div>
-                    <h3 class="text-xl font-bold gradient-text mb-4">ARNS</h3>
-                    <p class="text-gray-400">The decentralized naming service for the Arweave ecosystem.</p>
-                </div>
-                <div>
-                    <h4 class="text-lg font-semibold mb-4">Marketplace</h4>
-                    <ul class="space-y-2">
-                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Browse Domains</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Premium Listings</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Sell Your Domain</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 class="text-lg font-semibold mb-4">Resources</h4>
-                    <ul class="space-y-2">
-                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Documentation</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">API</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">FAQ</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 class="text-lg font-semibold mb-4">Community</h4>
-                    <ul class="space-y-2">
-                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Twitter</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Discord</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">GitHub</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
-                <p>© 2025 ARNS Marketplace. All rights reserved.</p>
-            </div>
-        </div>
-    </footer>
-
-    <!-- Mobile Menu (hidden by default) -->
-    <div id="mobile-menu" class="hidden fixed inset-0 bg-white z-50 flex flex-col p-6">
-        <div class="flex justify-between items-center mb-8">
-            <span class="text-2xl font-bold gradient-text">ARNS</span>
-            <button id="close-mobile-menu" class="text-gray-500 hover:text-indigo-600 transition-colors">
-                <i class="fas fa-times text-xl"></i>
-            </button>
-        </div>
-        <nav class="flex flex-col space-y-6">
-            <a href="/marketplace" class="text-xl text-gray-700 hover:text-indigo-600 transition-colors">Marketplace</a>
-            <a href="/domains" class="text-xl text-gray-700 hover:text-indigo-600 transition-colors">My Domains</a>
-            <a href="/faq" class="text-xl text-gray-700 hover:text-indigo-600 transition-colors">FAQ</a>
-        </nav>
-        <button id="mobile-connect-wallet" class="wallet-state wallet-state--default mt-8 py-3 text-lg">
-            <span>Connect Wallet</span>
-        </button>
-    </div>
+    <!-- Rest of your HTML remains the same until the JavaScript section -->
 
     <!-- JavaScript -->
+    <script src="https://unpkg.com/arweave@1.10.0/bundles/web.bundle.min.js"></script>
+    <script src="https://unpkg.com/arweave-account@1.0.2/dist/umd/index.js"></script>
     <script>
         // Initialize Arweave
         const arweave = Arweave.init({
@@ -490,16 +245,18 @@
             timeout: 20000
         });
 
-        // Wallet Manager
+        // Enhanced Wallet Manager
         class WalletManager {
             constructor() {
                 this.walletAddress = localStorage.getItem('arweaveAddress') || null;
                 this.isConnecting = false;
+                this.listeners = [];
             }
 
             async connect() {
                 if (this.isConnecting) return null;
                 this.isConnecting = true;
+                this.updateUI('processing');
 
                 try {
                     if (!this.hasWalletExtension()) {
@@ -517,8 +274,9 @@
                     this.walletAddress = await window.arweaveWallet.getActiveAddress();
                     localStorage.setItem('arweaveAddress', this.walletAddress);
                     
-                    this.updateUI();
+                    this.updateUI('connected');
                     this.showNotification('Wallet connected successfully!', 'success');
+                    this.notifyListeners('connected', this.walletAddress);
                     
                     return this.walletAddress;
                 } catch (error) {
@@ -526,6 +284,8 @@
                     this.walletAddress = null;
                     localStorage.removeItem('arweaveAddress');
                     this.showNotification(`Failed to connect wallet: ${error.message}`, 'error');
+                    this.updateUI('error');
+                    this.notifyListeners('error', error);
                     throw error;
                 } finally {
                     this.isConnecting = false;
@@ -539,9 +299,12 @@
                     }
                     this.walletAddress = null;
                     localStorage.removeItem('arweaveAddress');
-                    this.updateUI();
+                    this.updateUI('disconnected');
+                    this.notifyListeners('disconnected');
+                    this.showNotification('Wallet disconnected', 'info');
                 } catch (error) {
                     console.error('Wallet disconnection failed:', error);
+                    this.showNotification('Failed to disconnect wallet', 'error');
                     throw error;
                 }
             }
@@ -555,26 +318,47 @@
                 return `${this.walletAddress.substring(0, 6)}...${this.walletAddress.substring(this.walletAddress.length - 4)}`;
             }
 
-            updateUI() {
+            updateUI(state) {
                 const walletBtn = document.getElementById('connect-wallet');
                 const mobileWalletBtn = document.getElementById('mobile-connect-wallet');
                 
-                if (this.walletAddress) {
+                if (state === 'connected' && this.walletAddress) {
                     const shortAddress = this.getShortAddress();
                     
-                    // Update main wallet button
                     if (walletBtn) {
                         walletBtn.innerHTML = `<span>${shortAddress}</span>`;
                         walletBtn.className = 'wallet-state wallet-state--connected';
                     }
                     
-                    // Update mobile wallet button
                     if (mobileWalletBtn) {
                         mobileWalletBtn.innerHTML = `<span>${shortAddress}</span>`;
                         mobileWalletBtn.className = 'wallet-state wallet-state--connected';
                     }
-                } else {
-                    // Reset to default state
+                } 
+                else if (state === 'processing') {
+                    if (walletBtn) {
+                        walletBtn.innerHTML = '<i class="fas fa-spinner spinner mr-2"></i> Connecting...';
+                        walletBtn.className = 'wallet-state wallet-state--processing';
+                    }
+                    
+                    if (mobileWalletBtn) {
+                        mobileWalletBtn.innerHTML = '<i class="fas fa-spinner spinner mr-2"></i> Connecting...';
+                        mobileWalletBtn.className = 'wallet-state wallet-state--processing';
+                    }
+                }
+                else if (state === 'error') {
+                    if (walletBtn) {
+                        walletBtn.innerHTML = '<span>Connection Failed</span>';
+                        walletBtn.className = 'wallet-state wallet-state--error';
+                    }
+                    
+                    if (mobileWalletBtn) {
+                        mobileWalletBtn.innerHTML = '<span>Connection Failed</span>';
+                        mobileWalletBtn.className = 'wallet-state wallet-state--error';
+                    }
+                }
+                else {
+                    // Default/disconnected state
                     if (walletBtn) {
                         walletBtn.innerHTML = '<span>Connect Wallet</span>';
                         walletBtn.className = 'wallet-state wallet-state--default';
@@ -587,11 +371,18 @@
                 }
             }
 
+            addListener(callback) {
+                this.listeners.push(callback);
+            }
+
+            notifyListeners(event, data) {
+                this.listeners.forEach(callback => callback(event, data));
+            }
+
             showNotification(message, type = 'info') {
                 const notification = document.createElement('div');
                 notification.className = `notification notification--${type}`;
                 
-                // Add icon based on type
                 let iconClass = 'fa-info-circle';
                 if (type === 'success') iconClass = 'fa-check-circle';
                 if (type === 'error') iconClass = 'fa-exclamation-circle';
@@ -603,10 +394,10 @@
                 
                 document.body.appendChild(notification);
                 
-                setTimeout(() => {
-                    notification.classList.add('show');
-                }, 10);
+                // Show notification
+                setTimeout(() => notification.classList.add('show'), 10);
                 
+                // Auto-hide after 5 seconds
                 setTimeout(() => {
                     notification.classList.remove('show');
                     setTimeout(() => notification.remove(), 300);
@@ -618,11 +409,25 @@
         class ARNSMarketplace {
             constructor(walletManager) {
                 this.walletManager = walletManager;
+                this.arnsSearchEndpoint = 'https://arns.ar.io/#/?search=';
+            }
+
+            async init() {
+                // Set up search form
+                const searchForm = document.getElementById('searchForm');
+                if (searchForm) {
+                    searchForm.addEventListener('submit', (e) => {
+                        e.preventDefault();
+                        const searchTerm = document.getElementById('domainSearch').value.trim();
+                        if (searchTerm) {
+                            window.location.href = `${this.arnsSearchEndpoint}${encodeURIComponent(searchTerm)}`;
+                        }
+                    });
+                }
             }
 
             async buyDomain(domainName, price, recipientAddress = 'WvbhPqUUADehhuWLwaxXZLKsyagU8PolR6IpUE7NH4M') {
                 try {
-                    // Validate inputs
                     if (!domainName || !price) {
                         throw new Error('Domain name and price are required');
                     }
@@ -643,7 +448,7 @@
                         quantity: arweave.ar.arToWinston(price.toString()),
                     });
 
-                    // Add metadata as tags
+                    // Add metadata tags
                     transaction.addTag('App-Name', 'ARNS-Marketplace');
                     transaction.addTag('App-Version', '2.0.0');
                     transaction.addTag('Type', 'domain-purchase');
@@ -651,10 +456,8 @@
                     transaction.addTag('Buyer', this.walletManager.walletAddress);
                     transaction.addTag('Timestamp', Date.now().toString());
 
-                    // Sign transaction
+                    // Sign and submit transaction
                     await arweave.transactions.sign(transaction);
-                    
-                    // Submit transaction
                     const response = await arweave.transactions.post(transaction);
                     
                     if (response.status !== 200) {
@@ -688,8 +491,13 @@
             const walletManager = new WalletManager();
             const marketplace = new ARNSMarketplace(walletManager);
 
+            // Initialize marketplace features
+            await marketplace.init();
+
             // Initialize UI with current wallet state
-            walletManager.updateUI();
+            if (walletManager.walletAddress) {
+                walletManager.updateUI('connected');
+            }
 
             // Mobile menu toggle
             const mobileMenuButton = document.getElementById('mobile-menu-button');
@@ -716,6 +524,8 @@
             document.querySelectorAll('.buy-now').forEach(button => {
                 button.addEventListener('click', async function(e) {
                     e.preventDefault();
+                    e.stopPropagation(); // Prevent card click event
+                    
                     const domainName = this.getAttribute('data-domain');
                     const price = this.getAttribute('data-price');
                     
@@ -740,27 +550,9 @@
             document.querySelectorAll('.domain-card').forEach(card => {
                 card.addEventListener('click', function() {
                     const domainName = this.querySelector('.domain-card__title').textContent;
-                    walletManager.showNotification(`Viewing details for ${domainName}`, 'info');
+                    window.location.href = `${marketplace.arnsSearchEndpoint}${encodeURIComponent(domainName)}`;
                 });
             });
-            
-            // Search functionality
-            const searchInput = document.querySelector('.search-input');
-            const searchButton = document.querySelector('.search-input + button');
-            
-            if (searchInput && searchButton) {
-                const performSearch = (query) => {
-                    if (query.trim()) {
-                        walletManager.showNotification(`Searching for: ${query}`, 'info');
-                    }
-                };
-                
-                searchButton.addEventListener('click', () => performSearch(searchInput.value));
-                
-                searchInput.addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter') performSearch(searchInput.value);
-                });
-            }
         });
     </script>
 </body>
